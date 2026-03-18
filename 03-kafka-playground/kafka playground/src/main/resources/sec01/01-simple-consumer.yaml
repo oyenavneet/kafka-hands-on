@@ -1,0 +1,9 @@
+# by default, the Kafka binder connect to localhost:9092
+spring:
+  cloud:
+    function:
+      definition: consumer
+    stream:
+      bindings:
+        consumer-in-0:
+          destination: demo-topic

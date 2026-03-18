@@ -10,12 +10,12 @@ import reactor.core.publisher.Mono;
 import java.util.function.Function;
 
 @Configuration
-public class ConsumerConfig {
+public class ReactiveConsumerConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReactiveConsumerConfig.class);
 
     @Bean
-    public Function<Flux<String>, Mono<Void>> consumer() {
+    public Function<Flux<String>, Mono<Void>> reactiveConsumer() {
 
         return flux -> flux.doOnNext(msg -> logger.info("received: {}", msg))
                 .then();

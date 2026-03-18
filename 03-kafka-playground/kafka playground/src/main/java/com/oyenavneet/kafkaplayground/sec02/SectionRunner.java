@@ -1,4 +1,4 @@
-package com.oyenavneet.kafkaplayground.sec01;
+package com.oyenavneet.kafkaplayground.sec02;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,8 +8,8 @@ public class SectionRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SectionRunner.class,
-				"--section=sec01",
-				"--config=04-multiple-topics"
+				"--section=sec02",
+				"--config=01-reactive-consumer"
 				);
 	}
 

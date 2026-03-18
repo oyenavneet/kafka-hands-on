@@ -1,4 +1,4 @@
-package com.oyenavneet.kafka_playground;
+package com.oyenavneet.kafkaplayground;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
