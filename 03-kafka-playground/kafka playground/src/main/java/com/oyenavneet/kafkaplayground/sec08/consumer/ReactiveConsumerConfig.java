@@ -1,0 +1,40 @@
+package com.oyenavneet.kafkaplayground.sec08.consumer;
+
+import com.oyenavneet.kafkaplayground.sec08.dto.Notification;
+import com.oyenavneet.kafkaplayground.sec08.dto.Payment;
+import com.oyenavneet.kafkaplayground.sec08.dto.Shipment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+@Configuration
+public class ReactiveConsumerConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReactiveConsumerConfig.class);
+
+    @Bean
+    public Function<Flux<Payment>, Mono<Void>> paymentConsumer() {
+        return this::logReceived;
+    }
+
+    @Bean
+    public Function<Flux<Shipment>, Mono<Void>> shipmentConsumer() {
+        return this::logReceived;
+    }
+
+    @Bean
+    public Function<Flux<Notification>, Mono<Void>> notificationConsumer() {
+        return this::logReceived;
+    }
+
+    private <T> Mono<Void> logReceived(Flux<T> flux) {
+        return flux.doOnNext(item -> logger.info("received: {}", item))
+                .then();
+    }
+}
