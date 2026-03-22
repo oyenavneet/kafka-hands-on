@@ -69,5 +69,5 @@ A processor application can emit zero, one, or multiple events for each event it
 ## Event Routing
 Process of directing an event to one or more destination based on rules such as event content or runtime conditions.
 Type:
-- Content-based → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions
-- Dynamic → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions.
+- Content-based → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions. (sec09)
+- Dynamic → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions. (sec10)
