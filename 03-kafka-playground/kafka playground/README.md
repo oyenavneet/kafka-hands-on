@@ -57,7 +57,7 @@ A processor application can emit zero, one, or multiple events for each event it
     - Binder sends it as:
       - Message<List<Notification>> (single kafka record
   - Case 2: Returning a List<Message<T>>
-    - ○ Function<Order, List<Message<Notification>>>
+    - Function<Order, List<Message<Notification>>>
   - Spring Cloud Stream interpretation
     - Function returns a collection of Message objects
     - Binder treats each Message as independent
@@ -71,3 +71,27 @@ Process of directing an event to one or more destination based on rules such as 
 Type:
 - Content-based → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions. (sec09)
 - Dynamic → Process of directing an event to one or more destinations based on rules such as event content or runtime conditions. (sec10)
+
+## Kafka Cluster
+
+- **High Availability**: Data is replicated across multiple brokers to ensure fault tolerance and minimal downtime.
+  - Each partition has a **leader** and one or more **followers**
+  - Partitions are replicated across brokers based on the **replication factor**
+  - If a leader fails, a follower is automatically promoted to leader
+  - Ensures no data loss and continuous availability
+  - **Replication** is the key factor for availability
+
+- **Horizontal Scalability**: Kafka scales by distributing data and load across multiple brokers and partitions.
+  - A topic is divided into multiple partitions
+  - Partitions are distributed across different brokers in the cluster
+  - Producers can write to multiple partitions in parallel
+  - Consumers in a consumer group can read from partitions in parallel
+  - Adding more brokers increases system capacity
+  - Increasing partitions improves parallelism and throughput
+  - **Brokers** provide capacity
+  - **Partitions** provide scalability
+
+- **Kafka Roles (`process.roles`)**:
+  - **Broker** → Handles read and write operations
+  - **Controller** → Manages cluster metadata and coordination
+  - **Broker + Controller** → Can perform both roles
