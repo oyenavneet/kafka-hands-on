@@ -95,3 +95,41 @@ Type:
   - **Broker** → Handles read and write operations
   - **Controller** → Manages cluster metadata and coordination
   - **Broker + Controller** → Can perform both roles
+
+## Kafka - Batch Processing
+- Batch processing improves throughput by reducing per-message overhead.
+- Sending messages to kafka or consuming messages one by one are network call so avoid message one by one
+- Instead, sending/consumer message in a batch significantly improve the performance
+
+****Producing Message in Batches****
+- Kafka client library buffers records in memory and send them together based on the configurations.
+- Below are some properties which we tune for batch processing of messages in kafka
+  - ***linger.ms*** → How long (in ms) the producer waits for more message to arrive before sending in batch. (Default value is 0) 
+  - ***batch.size*** → The maximum size (in bytes) of sing batch. (Default size is 16 KB)
+  - ***compression.type*** → The algorithm the producer use to shrink data before sending it over the network (Default value is none)
+    - **Iz4** → Very fast + Moderate compression
+    - **zstd** → Fast + High compression. Good for large message
+    - **gzip** → Slow + Max compression
+    - **snappy** → Similar to LZ4. Legacy
+
+****Consuming Message in Batches****
+- Below are some properties which we tune for batch processing of messages in kafka
+  - ***max.poll.records*** → The maximum number if records returned in a single call. Upper limit (Not to receive too much). (Default:1)
+  - ***fetch.min.bytes*** → The minimum amount of data (in bytes) the broker must collect before sending it to the consumer. Lowe limit. (Default:1).
+  - ***fetch.max.wait.ms*** → The deadline for the broker to wait for ***fetch.min.bytes***. (Default:500)
+- Tuning above properties make the kafka broker and consumer application more efficient 
+- However, spring cloud stream will be delivering messages one by one to our function 
+- Kafka consumer fetches records in batched.
+- The message handler process one message at a time, and each message results in an individual database call.
+- Kafka batch consumption does NOT automatically translate to batch database writes.
+- To enable ***End-to-End Batching*** along with above tuning properties we have  exposed our consumer bean like 
+- ```java
+  @Bean
+  Consumer<List<String>> consumer(){
+    return list -> {
+        // some code
+        // repository.saveAll(entities)
+    };
+  }
+  ```
+- Also need to configure ***batch-mode: true*** in out consumer binding configuration yaml/properties file
