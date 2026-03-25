@@ -133,3 +133,48 @@ Type:
   }
   ```
 - Also need to configure ***batch-mode: true*** in out consumer binding configuration yaml/properties file
+
+## Kafka - Concurrent Message Processing  (Scaling Performance)
+- When scaling with multiple Kafka brokers is not required, performance can be improved within a single node by utilizing multiple CPU cores through concurrency tuning.
+- Spring Cloud Stream: Default Behavior
+  - Spring Cloud Stream use **single-thread** message consumption.
+  - Only one Kafka consumer is created per binding.
+  - Messages are processed sequentially.
+
+- **Improving Concurrency**
+  - Increase the **concurrency level** to create multiple consumer threads
+  - Allows parallel processing of messages from different partitions
+  - Effective when topics have multiple partitions
+  - Helps improve throughput without adding more Kafka nodes
+
+- **Key Considerations**
+  - Concurrency is limited by the number of partitions
+  - Message ordering is maintained only within a partition
+  - Higher concurrency may lead to unordered processing across partitions
+
+---
+**Note**  
+Even if we set `consumer.concurrency = 3` (or any value), there is a high chance that the **producer publishes messages much faster** than the consumer can process them.
+---
+
+### ***To handle the above***:
+- **Problem Context**
+  - Producer publishing speed is very high
+  - Processor/Consumer processing speed is low
+  - Framework-level concurrency is NOT sufficient
+
+### **Scenario 1: Message ordering is NOT important**
+**Solution**:
+- Use **unordered concurrent processing**
+- Process messages in parallel using multiple threads (e.g., thread pools / virtual threads)
+- Do not rely on partition-level ordering
+- Maximize throughput by increasing parallelism at the application level
+- Suitable for independent events (no ordering dependency)
+
+### **Scenario 2: Message ordering IS important (based on a key)**
+**Solution**:
+- Use **key-based ordered processing**
+- Ensure all messages with the same key are processed sequentially
+- Route messages to the same processing thread/queue based on key (key-based partitioning or hashing)
+- Maintain ordering within each key while still allowing parallelism across different keys
+- Helps balance **ordering guarantees + performance**
