@@ -178,3 +178,55 @@ Even if we set `consumer.concurrency = 3` (or any value), there is a high chance
 - Route messages to the same processing thread/queue based on key (key-based partitioning or hashing)
 - Maintain ordering within each key while still allowing parallelism across different keys
 - Helps balance **ordering guarantees + performance**
+
+## Kafka - Message Acknowledgment / Offset Commit
+- **Acknowledgment** is an application concept.
+- **Offset commit** is the kafka operation behind it.
+- In Most of the cases we do not manually Acknowledgment it will be done by framework for us.
+- It ensures data reliability by confirming message receipt between producers, brokers, and consumers
+- Producer Acknowledgment (acks setting) 
+  - acks=0 (None): The producer does not wait for any acknowledgment, prioritizing throughput over data safety, leading to high data loss risk.
+  - acks=1 (Leader): The producer waits for the leader partition to confirm receipt. If the leader fails before replication, data might be lost.
+  - acks=all or -1 (All Replicas): The producer waits for all in-sync replicas (ISRs) to acknowledge receipt, providing the highest durability at the cost of higher latency.
+- Consumer Acknowledgment (Offset Management) 
+  - Auto-Commit: Consumers automatically commit the highest offset periodically, ensuring low complexity but potential data duplication if processing fails mid-batch.
+  - Manual Commit: Consumers explicitly call commitSync or commitAsync after processing a record, offering higher reliability and control.
+
+## Manual Acknowledgement
+
+Manual acknowledgement allows the application to explicitly control when a message is considered successfully processed.
+
+### **Requirements**
+- The consumer must receive messages as a **Message type** (to access metadata and headers)
+  - ```Java
+    @Bean
+    Consumer<Message<OrderEvent>> orderEvent(){
+        return msg -> "some implementation";
+    }
+    ```
+- Spring cloud stream Consumer config YAML file we need to enable consumer:
+  - ```yaml
+      consumer:
+        ack-mode: MANUAL
+    ```
+### **How it works**
+- The application processes the message
+- On successful processing → explicitly acknowledge the message
+- If not acknowledged → offset is not committed and message can be retried
+
+## Negative Acknowledgement (NACK)
+- This is NOT a kafka concept. It is a framework feature
+- Message is NOT acknowledged (Offset is not committed).
+- Message is retried after a delay.
+- Used for temporary / recoverable error.
+
+```java
+  var acknowledgement = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgement.class);
+    try{
+        // some code to process message
+        acknowledgement.acknowledge();
+    }catch(Exception e){
+        acknowledgement.nack(Duration.ofSeconds(5));
+    }
+```
+- In Batch Mode: for Manual Acknowledgment will we get single ACKNOWLEDGMENT for list/batch of events. we need to process all teh event in batch and then acknowledge.
