@@ -230,3 +230,41 @@ Manual acknowledgement allows the application to explicitly control when a messa
     }
 ```
 - In Batch Mode: for Manual Acknowledgment will we get single ACKNOWLEDGMENT for list/batch of events. we need to process all teh event in batch and then acknowledge.
+
+## Error Handling & Fault Tolerance
+
+### Error Handling Expectations
+
+| Scenario                                          | Expected Behavior                                                                     |
+|--------------------------------------------------|---------------------------------------------------------------------------------------|
+| Message processed successfully                   | Acknowledge the message / Commit the offset                                           |
+| Message processing fails                         | Do not commit the offset                                                              |
+| Failure is retryable                             | Retry the message using a retry strategy:<br/> - Fixed delay<br/> - Exponential backoff |
+| Failure is not retryable (invalid / corrupt data)| Skip retry, commit the offset, and publish details to DLQ/DLT                         |
+| Retry attempts exhausted                         | Stop retrying, commit the offset, and publish details to DLQ/DLT                      |
+
+---
+
+### Error Handling in Spring Cloud Stream
+
+- Supports **retry mechanisms** for transient failures
+- Allows configuration of:
+  - Retry attempts
+  - Backoff strategies (fixed / exponential)
+- Integrates with **Dead Letter Queue / Topic (DLQ/DLT)** for failed messages
+- Helps ensure reliability without losing data
+
+---
+
+### Dynamic Pause & Resume of Bindings
+
+- Useful when a consumer service (e.g., pod) is temporarily down or under heavy load
+- Spring Cloud Stream provides **BindingsLifecycleController** to manage bindings
+
+#### Key Capabilities:
+- **Pause** → Temporarily stop message consumption
+- **Resume** → Continue consumption from the last committed offset
+
+#### Benefit:
+- Ensures the consumer resumes processing **from where it left off** without data loss
+
