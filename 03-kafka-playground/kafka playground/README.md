@@ -245,7 +245,7 @@ Manual acknowledgement allows the application to explicitly control when a messa
 
 ---
 
-### Error Handling in Spring Cloud Stream
+### Error Handling in Spring Cloud Stream -- sec16
 
 - Supports **retry mechanisms** for transient failures
 - Allows configuration of:
@@ -256,7 +256,7 @@ Manual acknowledgement allows the application to explicitly control when a messa
 
 ---
 
-### Dynamic Pause & Resume of Bindings
+### Dynamic Pause & Resume of Bindings -- sec17
 
 - Useful when a consumer service (e.g., pod) is temporarily down or under heavy load
 - Spring Cloud Stream provides **BindingsLifecycleController** to manage bindings
@@ -268,3 +268,22 @@ Manual acknowledgement allows the application to explicitly control when a messa
 #### Benefit:
 - Ensures the consumer resumes processing **from where it left off** without data loss
 
+## Data Integrity : Kafka Transaction
+- It provides a mechanism to ensure exactly-once processing (EOS) semantics for applications that read from and write to Kafka topics.
+- **Kafka Transaction Coordinator** is a broker-side module managing transaction states and metadata within an internal __transaction_state topic.
+  - It ensures atomicity by coordinating the two-phase commit protocol for producer operations, mapping transactional.id to specific partitions.
+  - It assigns Producer IDs (PID) and ensures exactly-once semantics.
+
+### Consumers: Isolation Level -- Demo Project sec18
+- Controls which record a consumer can read from a topic.
+- **read_uncommited**
+  - Default option
+  - Read all record - Included uncommited / aborted transactional data.
+- **read_commited**
+  - Read only commited records
+  - Hides aborted transactions
+```yaml
+    # consumer configuration
+    isolation.level=read_uncommited
+    isolation.level=read_commited
+```
