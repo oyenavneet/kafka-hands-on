@@ -287,3 +287,20 @@ Manual acknowledgement allows the application to explicitly control when a messa
     isolation.level=read_uncommited
     isolation.level=read_commited
 ```
+
+## Integration Testing Strategies
+- Test Binder
+  - Implementation provided by Spring Cloud Stream
+  - Used to testing without connecting to a messaging system like kafka
+  - Used When
+    - You want fast tests without Kafka
+    - You're testing application logic and message flow
+    - Broker behavior is not relevant
+- Testcontainers with kafka
+  - Run a real kafka broker in a Docker Containers during tests.
+  - Application connects using the actual Kafka client configuration
+  - Verifies application behavior with kafka-level semantics
+  - Used When
+    - You want to test against a real Kafka broker
+    - You need kafka behavior like partitions, offset, serialization
+    - You want production-like confidence
