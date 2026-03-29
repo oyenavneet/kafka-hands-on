@@ -304,3 +304,36 @@ Manual acknowledgement allows the application to explicitly control when a messa
     - You want to test against a real Kafka broker
     - You need kafka behavior like partitions, offset, serialization
     - You want production-like confidence
+
+## Kafka Security
+- Authenticate clients (enable authentication)
+- Encrypt data in transit
+
+### Security Protocols in Kafka
+| Protocol                 | Authenticated | Encrypted |
+|--------------------------|---------------|-----------|
+| PLAINTEXT                | NO            | NO        |
+| SSL                      | NO            | YES       |
+| SASL_PLAINTEXT           | YES           | NO        |
+| SASL_SSL                 | YES           | YES       |
+
+### SASL
+- Simple Authentication and Security Layer
+  - Standard authentication framework used by many application protocols.
+  - Decouples authentication mechanisms from the protocol.
+  - Used by:
+    - **Messaging**: Kafka, RabbitMq
+    - **Email**: SMTP, IMAP, POP3
+    - **Databases**: PostgreSQL
+
+### JAAS
+- Java Authentication and Authorization Service
+  - Java-based security framework for authentication and authorization
+  - Provides a pluggable way to define how users are authenticated
+  - Works together with SASL to enable secure communication in Kafka
+  - Uses login configuration files to specify authentication modules
+  - Used by:
+    - **Messaging**: Kafka (for SASL authentication)
+    - **Java Applications**: Secure access control and identity management
+    - **Enterprise Systems**: Integration with LDAP, Kerberos, etc.
+
