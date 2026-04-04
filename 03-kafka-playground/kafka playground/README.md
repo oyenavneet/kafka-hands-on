@@ -337,3 +337,92 @@ Manual acknowledgement allows the application to explicitly control when a messa
     - **Java Applications**: Secure access control and identity management
     - **Enterprise Systems**: Integration with LDAP, Kerberos, etc.
 
+
+## Best Practices
+
+### Producer Ack
+
+| acks | Behavior                                  |
+|------|-------------------------------------------|
+| -1   | All → Leader + in-sync replicas (strong durability) |
+| 0    | None → Fire-and-forget (no guarantee)     |
+| 1    | Leader only (moderate durability)         |
+
+---
+
+### Min In-Sync Replicas
+
+```yaml
+min.insync.replicas=2
+````
+
+* Minimum number of replicas that must acknowledge a write
+* Works with `acks=all` to ensure strong durability
+* Prevents data loss in case of broker failure
+
+---
+
+### Idempotent Producer
+
+```yaml
+enable.idempotence=true
+```
+
+* Ensures **no duplicate messages** are produced
+* Guarantees **exactly-once delivery** (at producer level)
+* Recommended for critical systems
+
+---
+
+### Compression at Producer Side
+
+```yaml
+compression.type=none/gzip/snappy/lz4
+```
+
+* Reduces network bandwidth usage
+* Improves throughput
+* Trade-off between CPU usage and compression efficiency
+
+---
+
+### How many topics should I create for my application?
+
+* Create topics based on **business domains or event types**
+* Avoid creating too many small topics unnecessarily
+* Each topic should represent a **clear logical boundary**
+* Example: `order-events`, `payment-events`, `notification-events`
+
+---
+
+### How many partitions should I create?
+
+* Depends on **throughput and parallelism requirements**
+* More partitions → higher parallel processing
+* Must be ≥ number of consumers in a consumer group
+* Too many partitions can increase overhead
+* Choose based on:
+
+  * Expected load
+  * Consumer scalability
+  * Future growth
+
+---
+
+### How many replication factor should I have?
+
+* Typically **2 or 3** in production
+* Higher replication → better fault tolerance
+* Trade-off:
+
+  * More replication = more storage + network cost
+* Recommended:
+
+  * **2** → Minimum for reliability
+  * **3** → Standard for production systems
+
+
+
+
+
+
